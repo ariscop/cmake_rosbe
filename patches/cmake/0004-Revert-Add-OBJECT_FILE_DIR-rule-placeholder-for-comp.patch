@@ -1,0 +1,95 @@
+From ce07ccbfa411b22e5c3553ad0592f8083e80d958 Mon Sep 17 00:00:00 2001
+From: Amine Khaldi <amine.khaldi@reactos.org>
+Date: Thu, 19 Mar 2015 10:51:08 +0100
+Subject: [PATCH 04/17] Revert "Add OBJECT_FILE_DIR rule placeholder for
+ compilation lines" as we do not need this extra verbosity in our build.ninja
+ files.
+
+This reverts commit 8256ccb78c80bbe50c966ba15b109bfd0f573276.
+---
+ Source/cmLocalGenerator.cxx          | 7 -------
+ Source/cmLocalGenerator.h            | 1 -
+ Source/cmMakefileTargetGenerator.cxx | 5 -----
+ Source/cmNinjaTargetGenerator.cxx    | 6 ------
+ 4 files changed, 19 deletions(-)
+
+diff --git a/Source/cmLocalGenerator.cxx b/Source/cmLocalGenerator.cxx
+index 08ecc9d6f..402cf9136 100644
+--- a/Source/cmLocalGenerator.cxx
++++ b/Source/cmLocalGenerator.cxx
+@@ -875,13 +875,6 @@ cmLocalGenerator::ExpandRuleVariable(std::string const& variable,
+       return replaceValues.ObjectDir;
+       }
+     }
+-  if(replaceValues.ObjectFileDir)
+-    {
+-    if(variable == "OBJECT_FILE_DIR")
+-      {
+-      return replaceValues.ObjectFileDir;
+-      }
+-    }
+   if(replaceValues.Objects)
+     {
+     if(variable == "OBJECTS")
+diff --git a/Source/cmLocalGenerator.h b/Source/cmLocalGenerator.h
+index d64ae0f80..defb3a7ee 100644
+--- a/Source/cmLocalGenerator.h
++++ b/Source/cmLocalGenerator.h
+@@ -271,7 +271,6 @@ public:
+     const char* Output;
+     const char* Object;
+     const char* ObjectDir;
+-    const char* ObjectFileDir;
+     const char* Flags;
+     const char* ObjectsQuoted;
+     const char* SONameFlag;
+diff --git a/Source/cmMakefileTargetGenerator.cxx b/Source/cmMakefileTargetGenerator.cxx
+index c95aab9f7..45de1eb0f 100644
+--- a/Source/cmMakefileTargetGenerator.cxx
++++ b/Source/cmMakefileTargetGenerator.cxx
+@@ -706,11 +706,6 @@ cmMakefileTargetGenerator
+                             cmLocalGenerator::START_OUTPUT,
+                             cmLocalGenerator::SHELL);
+   vars.ObjectDir = objectDir.c_str();
+-  std::string objectFileDir = cmSystemTools::GetFilenamePath(obj);
+-  objectFileDir = this->Convert(objectFileDir,
+-                                cmLocalGenerator::START_OUTPUT,
+-                                cmLocalGenerator::SHELL);
+-  vars.ObjectFileDir = objectFileDir.c_str();
+   vars.Flags = flags.c_str();
+ 
+   std::string definesString = "$(";
+diff --git a/Source/cmNinjaTargetGenerator.cxx b/Source/cmNinjaTargetGenerator.cxx
+index 2e20e4289..81a70b364 100644
+--- a/Source/cmNinjaTargetGenerator.cxx
++++ b/Source/cmNinjaTargetGenerator.cxx
+@@ -393,7 +393,6 @@ cmNinjaTargetGenerator
+   vars.TargetPDB = "$TARGET_PDB";
+   vars.TargetCompilePDB = "$TARGET_COMPILE_PDB";
+   vars.ObjectDir = "$OBJECT_DIR";
+-  vars.ObjectFileDir = "$OBJECT_FILE_DIR";
+ 
+   cmMakefile* mf = this->GetMakefile();
+ 
+@@ -655,10 +654,6 @@ cmNinjaTargetGenerator
+   vars["OBJECT_DIR"] = this->GetLocalGenerator()->ConvertToOutputFormat(
+                          ConvertToNinjaPath(objectDir),
+                          cmLocalGenerator::SHELL);
+-  std::string objectFileDir = cmSystemTools::GetFilenamePath(objectFileName);
+-  vars["OBJECT_FILE_DIR"] = this->GetLocalGenerator()->ConvertToOutputFormat(
+-                              ConvertToNinjaPath(objectFileDir),
+-                              cmLocalGenerator::SHELL);
+ 
+   this->addPoolNinjaVariable("JOB_POOL_COMPILE", this->GetTarget(), vars);
+ 
+@@ -687,7 +682,6 @@ cmNinjaTargetGenerator
+     compileObjectVars.Source = escapedSourceFileName.c_str();
+     compileObjectVars.Object = objectFileName.c_str();
+     compileObjectVars.ObjectDir = objectDir.c_str();
+-    compileObjectVars.ObjectFileDir = objectFileDir.c_str();
+     compileObjectVars.Flags = vars["FLAGS"].c_str();
+     compileObjectVars.Defines = vars["DEFINES"].c_str();
+ 
+-- 
+2.17.1
+

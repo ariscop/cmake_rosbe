@@ -1,0 +1,356 @@
+From 4e4fb4d9538f48ee9340a886ef83f406f3cf0117 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Peter=20K=C3=BCmmel?= <syntheticpp@gmx.net>
+Date: Tue, 26 Nov 2013 17:44:21 +0100
+Subject: [PATCH 03/17] =?UTF-8?q?Add=20source=20file=20properties=20EXTERN?=
+ =?UTF-8?q?AL=5FSOURCE=20and=20OBJECT=5FLOCATION.=20With=20these=20two=20p?=
+ =?UTF-8?q?roperties=20it=20is=20much=20easier=20to=20support=20precompile?=
+ =?UTF-8?q?d=20headers.=20This=20work=20was=20kindly=20provided=20by=20Pet?=
+ =?UTF-8?q?er=20K=C3=BCmmel=20and=20landed=20in=20https://github.com/synth?=
+ =?UTF-8?q?eticpp/CMake/tree/pch-properties?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ Source/cmGeneratorTarget.h                |  5 +-
+ Source/cmLocalGenerator.cxx               | 15 +++++
+ Source/cmMakefileTargetGenerator.cxx      | 48 +++++++++++---
+ Source/cmNinjaTargetGenerator.cxx         | 36 +++++++++-
+ Source/cmSourceFile.cxx                   | 19 ++++++
+ Tests/CMakeLists.txt                      |  1 +
+ Tests/SourceFileProperties/CMakeLists.txt | 80 +++++++++++++++++++++++
+ 7 files changed, 191 insertions(+), 13 deletions(-)
+ create mode 100644 Tests/SourceFileProperties/CMakeLists.txt
+
+diff --git a/Source/cmGeneratorTarget.h b/Source/cmGeneratorTarget.h
+index 2083b8858..c77acc60c 100644
+--- a/Source/cmGeneratorTarget.h
++++ b/Source/cmGeneratorTarget.h
+@@ -132,13 +132,16 @@ public:
+     mutable std::set<std::string> ExpectedResxHeaders;
+     mutable std::vector<cmSourceFile const*> ResxSources;
+   };
++
++  mutable std::map<cmSourceFile const*, std::string> Objects;
++
++
+ private:
+   friend class cmTargetTraceDependencies;
+   struct SourceEntry { std::vector<cmSourceFile*> Depends; };
+   typedef std::map<cmSourceFile const*, SourceEntry> SourceEntriesType;
+   SourceEntriesType SourceEntries;
+ 
+-  mutable std::map<cmSourceFile const*, std::string> Objects;
+   std::set<cmSourceFile const*> ExplicitObjectName;
+   mutable std::map<std::string, std::vector<std::string> > SystemIncludesCache;
+ 
+diff --git a/Source/cmLocalGenerator.cxx b/Source/cmLocalGenerator.cxx
+index dd4a8f880..08ecc9d6f 100644
+--- a/Source/cmLocalGenerator.cxx
++++ b/Source/cmLocalGenerator.cxx
+@@ -3302,6 +3302,21 @@ cmLocalGenerator
+                                  std::string const& dir_max,
+                                  bool* hasSourceExtension)
+ {
++  // A specified OBJECT_LOCATION overwrites the generated file name
++  if (const char* location = source.GetProperty("OBJECT_LOCATION"))
++    {
++    std::string fullPath;
++    if (cmSystemTools::FileIsFullPath(location))
++      {
++      fullPath = location;
++      }
++    else
++      {
++      fullPath = this->Convert(location, FULL);
++      }
++    return this->Convert(fullPath.c_str(), HOME_OUTPUT);
++    }
++
+   // Construct the object file name using the full path to the source
+   // file which is its only unique identification.
+   const char* fullPath = source.GetFullPath().c_str();
+diff --git a/Source/cmMakefileTargetGenerator.cxx b/Source/cmMakefileTargetGenerator.cxx
+index 4ece016bf..c95aab9f7 100644
+--- a/Source/cmMakefileTargetGenerator.cxx
++++ b/Source/cmMakefileTargetGenerator.cxx
+@@ -192,7 +192,14 @@ void cmMakefileTargetGenerator::WriteTargetBuildRules()
+         si = externalObjects.begin();
+       si != externalObjects.end(); ++si)
+     {
+-    this->ExternalObjects.push_back((*si)->GetFullPath());
++    if (const char* path = (*si)->GetProperty("OBJECT_LOCATION"))
++      {
++      this->Objects.push_back(path);
++      }
++    else
++      {
++      this->ExternalObjects.push_back((*si)->GetFullPath());
++      }
+     }
+   std::vector<cmSourceFile const*> objectSources;
+   this->GeneratorTarget->GetObjectSources(objectSources, config);
+@@ -437,12 +444,21 @@ void cmMakefileTargetGenerator
+     return;
+     }
+ 
+-  // Get the full path name of the object file.
+-  std::string const& objectName = this->GeneratorTarget
+-                                      ->GetObjectName(&source);
+-  std::string obj = this->LocalGenerator->GetTargetDirectory(*this->Target);
+-  obj += "/";
+-  obj += objectName;
++  std::string obj;
++  if (source.GetProperty("OBJECT_LOCATION"))
++    {
++    // path is already absolute or HOME_OUTPUT relative
++    obj = this->GeneratorTarget->Objects[&source];
++    }
++  else
++    {
++      // Get the full path name of the object file.
++      std::string const& objectName = this->GeneratorTarget
++                                          ->GetObjectName(&source);
++      obj = this->LocalGenerator->GetTargetDirectory(*this->Target);
++      obj += "/";
++      obj += objectName;
++    }
+ 
+   // Avoid generating duplicate rules.
+   if(this->ObjectFiles.find(obj) == this->ObjectFiles.end())
+@@ -468,7 +484,10 @@ void cmMakefileTargetGenerator
+     (this->LocalGenerator->ConvertToFullPath(dir).c_str());
+ 
+   // Save this in the target's list of object files.
+-  this->Objects.push_back(obj);
++  if (!source.GetPropertyAsBool("EXTERNAL_SOURCE"))
++    {
++    this->Objects.push_back(obj);
++    }
+   this->CleanFiles.push_back(obj);
+ 
+   // TODO: Remove
+@@ -756,8 +775,7 @@ cmMakefileTargetGenerator
+ 
+   // Check for extra outputs created by the compilation.
+   std::vector<std::string> outputs(1, relativeObj);
+-  if(const char* extra_outputs_str =
+-     source.GetProperty("OBJECT_OUTPUTS"))
++  if(const char* extra_outputs_str = source.GetProperty("OBJECT_OUTPUTS"))
+     {
+     // Register these as extra files to clean.
+     cmSystemTools::ExpandListArgument(extra_outputs_str, outputs);
+@@ -765,6 +783,16 @@ cmMakefileTargetGenerator
+                             outputs.begin() + 1, outputs.end());
+     }
+ 
++  if(const char* object_location_str = source.GetProperty("OBJECT_LOCATION"))
++    {
++    if (relativeObj != object_location_str)
++      {
++        cmSystemTools::ExpandListArgument(object_location_str, outputs);
++        this->CleanFiles.insert(this->CleanFiles.end(),
++                                outputs.begin() + 1, outputs.end());
++      }
++    }
++
+   // Write the rule.
+   this->WriteMakeRule(*this->BuildFileStream, 0, outputs,
+                       depends, commands, false);
+diff --git a/Source/cmNinjaTargetGenerator.cxx b/Source/cmNinjaTargetGenerator.cxx
+index cfd8937c6..2e20e4289 100644
+--- a/Source/cmNinjaTargetGenerator.cxx
++++ b/Source/cmNinjaTargetGenerator.cxx
+@@ -286,6 +286,12 @@ std::string
+ cmNinjaTargetGenerator
+ ::GetObjectFilePath(cmSourceFile const* source) const
+ {
++  if (source->GetProperty("OBJECT_LOCATION"))
++    {
++    // path is already absolute or HOME_OUTPUT relative
++    return this->GeneratorTarget->Objects[source];
++    }
++
+   std::string path = this->LocalGenerator->GetHomeRelativeOutputPath();
+   if(!path.empty())
+     path += "/";
+@@ -522,7 +528,14 @@ cmNinjaTargetGenerator
+         si = externalObjects.begin();
+       si != externalObjects.end(); ++si)
+     {
+-    this->Objects.push_back(this->GetSourceFilePath(*si));
++    if (const char* path = (*si)->GetProperty("OBJECT_LOCATION"))
++      {
++      this->Objects.push_back(this->ConvertToNinjaPath(path));
++      }
++    else
++      {
++      this->Objects.push_back(this->GetSourceFilePath(*si));
++      }
+     }
+ 
+   cmNinjaDeps orderOnlyDeps;
+@@ -584,8 +597,10 @@ cmNinjaTargetGenerator
+   cmNinjaDeps outputs;
+   std::string objectFileName = this->GetObjectFilePath(source);
+   outputs.push_back(objectFileName);
++
+   // Add this object to the list of object files.
+-  this->Objects.push_back(objectFileName);
++  if (!source->GetPropertyAsBool("EXTERNAL_SOURCE"))
++    this->Objects.push_back(objectFileName);
+ 
+   cmNinjaDeps explicitDeps;
+   std::string sourceFileName;
+@@ -715,6 +730,23 @@ cmNinjaTargetGenerator
+                                                 outputList,
+                                                 outputs);
+   }
++
++  if(const char* objectLocationStr = source->GetProperty("OBJECT_LOCATION")) {
++    std::string objectLocation =
++            this->GetLocalGenerator()
++                  ->Convert(objectLocationStr, cmLocalGenerator::HOME_OUTPUT);
++    if (std::find(outputs.begin(), outputs.end(), objectLocation)
++            == outputs.end()) {
++      std::vector<std::string> outputList;
++      cmSystemTools::ExpandListArgument(objectLocation, outputList);
++      std::transform(outputList.begin(), outputList.end(), outputList.begin(),
++                     MapToNinjaPath());
++      this->GetGlobalGenerator()->WritePhonyBuild(this->GetBuildFileStream(),
++                                                  "Location output file.",
++                                                  outputList,
++                                                  outputs);
++    }
++  }
+ }
+ 
+ //----------------------------------------------------------------------------
+diff --git a/Source/cmSourceFile.cxx b/Source/cmSourceFile.cxx
+index 684747591..f91e92228 100644
+--- a/Source/cmSourceFile.cxx
++++ b/Source/cmSourceFile.cxx
+@@ -399,3 +399,22 @@ void cmSourceFile::SetCustomCommand(cmCustomCommand* cc)
+   this->CustomCommand = cc;
+   delete old;
+ }
++
++
++
++/*
++  //TODO
++
++  cm->DefineProperty
++    ("EXTERNAL_SOURCE", cmProperty::SOURCE_FILE,
++     "If set to true then this is a source file.",
++     "If this property is set to true then file is a source file"
++     "and will be compiled but it will not be linked into the target");
++
++
++  cm->DefineProperty
++    ("OBJECT_LOCATION", cmProperty::SOURCE_FILE,
++     "Path to output file name.",
++     "The output will be created at the given path."
++     "A relative path is interpreted as relative to CMAKE_BINARY_DIR.");
++*/
+diff --git a/Tests/CMakeLists.txt b/Tests/CMakeLists.txt
+index 7e7aa2ec8..b585e4de3 100644
+--- a/Tests/CMakeLists.txt
++++ b/Tests/CMakeLists.txt
+@@ -262,6 +262,7 @@ if(BUILD_TESTING)
+   if(NOT CMake_TEST_EXTERNAL_CMAKE)
+     ADD_TEST_MACRO(LoadCommand LoadedCommand)
+   endif()
++  ADD_TEST_MACRO(SourceFileProperties SourceFileProperties)
+   ADD_TEST_MACRO(LinkDirectory bin/LinkDirectory)
+   ADD_TEST_MACRO(LinkLanguage LinkLanguage)
+   ADD_TEST_MACRO(LinkLine LinkLine)
+diff --git a/Tests/SourceFileProperties/CMakeLists.txt b/Tests/SourceFileProperties/CMakeLists.txt
+new file mode 100644
+index 000000000..553ac6693
+--- /dev/null
++++ b/Tests/SourceFileProperties/CMakeLists.txt
+@@ -0,0 +1,80 @@
++cmake_minimum_required (VERSION 2.8)
++
++project (SourceFileProperties)
++
++
++
++# linking with external would fail because of two main() definitions
++set(src ${CMAKE_CURRENT_BINARY_DIR}/src)
++file(WRITE ${src}1.cpp "int main() { return 0; }\n")
++file(WRITE ${src}2.cpp "int main() { return 0; }\n")
++
++set_source_files_properties(${src}2.cpp PROPERTIES EXTERNAL_SOURCE TRUE)
++
++add_executable(SourceFileProperties ${src}1.cpp ${src}2.cpp)
++
++
++
++# build with manual set object file name
++file(WRITE ${src}3.cpp "int main() { return 0; }\n")
++set(obj ${CMAKE_CURRENT_BINARY_DIR}/object_location${CMAKE_C_OUTPUT_EXTENSION})
++
++set_source_files_properties(${src}3.cpp PROPERTIES OBJECT_LOCATION ${obj})
++
++add_executable(SourceFileProperties2 ${src}3.cpp)
++
++
++
++# ensure the defined object filenname was used
++set_source_files_properties(external_object PROPERTIES
++    EXTERNAL_OBJECT TRUE
++    GENERATED TRUE
++    OBJECT_LOCATION ${obj}
++    LANGUAGE CXX)
++
++add_executable(SourceFileProperties3 external_object)
++
++
++
++
++###########################################
++# Precompiled header like tests
++
++set(all_headers ${CMAKE_CURRENT_BINARY_DIR}/all_headers.h)
++set(gch ${all_headers}.gch)
++
++file(WRITE ${all_headers} "#include <string>\n")
++file(WRITE ${src}4.cpp "std::string foo() { return std::string(); }\n")
++
++
++if(NOT MSVC)
++
++    set_source_files_properties(${all_headers} PROPERTIES
++        HEADER_FILE_ONLY FALSE
++        LANGUAGE CXX
++        EXTERNAL_SOURCE TRUE
++        OBJECT_LOCATION ${gch})
++
++    set_source_files_properties(${src}4.cpp PROPERTIES
++        COMPILE_FLAGS "-Winvalid-pch -include ${all_headers}"
++        OBJECT_DEPENDS ${gch})
++
++    set(pch_support ${all_headers})
++
++else()
++
++    file(WRITE ${all_headers}.cpp "#include \"${all_headers}\"\n")
++
++    set_source_files_properties(${all_headers}.cpp PROPERTIES
++        COMPILE_FLAGS "/Yc\"${all_headers}\" /Fp${gch}"
++        OBJECT_OUTPUTS ${gch})
++
++     set_source_files_properties(${src}4.cpp PROPERTIES
++        COMPILE_FLAGS "/FI${all_headers} /Yu${all_headers} /Fp${gch}"
++        OBJECT_DEPENDS ${gch})
++
++     set(pch_support ${all_headers}.cpp)
++
++endif()
++
++add_library(test_with_pch ${src}4.cpp ${pch_support})
+-- 
+2.17.1
+

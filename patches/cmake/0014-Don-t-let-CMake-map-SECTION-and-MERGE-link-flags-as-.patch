@@ -1,0 +1,128 @@
+From fb1c0b5e246bc24cc99e5fbe247af3652adf1012 Mon Sep 17 00:00:00 2001
+From: Amine Khaldi <amine.khaldi@reactos.org>
+Date: Sun, 22 Mar 2015 16:39:08 +0100
+Subject: [PATCH 14/17] Don't let CMake map SECTION and MERGE link flags as
+ that breaks some cases we have of multiple invocations of these commands.
+
+---
+ Source/cmVS10LinkFlagTable.h | 4 ++++
+ Source/cmVS11LinkFlagTable.h | 4 ++++
+ Source/cmVS12LinkFlagTable.h | 4 ++++
+ Source/cmVS14LinkFlagTable.h | 4 ++++
+ 4 files changed, 16 insertions(+)
+
+diff --git a/Source/cmVS10LinkFlagTable.h b/Source/cmVS10LinkFlagTable.h
+index f6b758d05..785f6a348 100644
+--- a/Source/cmVS10LinkFlagTable.h
++++ b/Source/cmVS10LinkFlagTable.h
+@@ -235,9 +235,11 @@ static cmVS7FlagTable cmVS10LinkFlagTable[] =
+   {"Version", "VERSION:",
+    "Version",
+    "", cmVS7FlagTable::UserValue},
++#if 0
+   {"SpecifySectionAttributes", "SECTION:",
+    "Specify Section Attributes",
+    "", cmVS7FlagTable::UserValue},
++#endif
+   {"MSDOSStubFileName", "STUB:",
+    "MS-DOS Stub File Name",
+    "", cmVS7FlagTable::UserValue},
+@@ -288,9 +290,11 @@ static cmVS7FlagTable cmVS10LinkFlagTable[] =
+   {"ImportLibrary", "IMPLIB:",
+    "Import Library",
+    "", cmVS7FlagTable::UserValue},
++#if 0
+   {"MergeSections", "MERGE:",
+    "Merge Sections",
+    "", cmVS7FlagTable::UserValue},
++#endif
+   {"LinkKeyFile", "KEYFILE:",
+    "Key File",
+    "", cmVS7FlagTable::UserValue},
+diff --git a/Source/cmVS11LinkFlagTable.h b/Source/cmVS11LinkFlagTable.h
+index 0f641e40e..12f8ef52e 100644
+--- a/Source/cmVS11LinkFlagTable.h
++++ b/Source/cmVS11LinkFlagTable.h
+@@ -264,9 +264,11 @@ static cmVS7FlagTable cmVS11LinkFlagTable[] =
+   {"Version", "VERSION:",
+    "Version",
+    "", cmVS7FlagTable::UserValue},
++#if 0
+   {"SpecifySectionAttributes", "SECTION:",
+    "Specify Section Attributes",
+    "", cmVS7FlagTable::UserValue},
++#endif
+   {"MSDOSStubFileName", "STUB:",
+    "MS-DOS Stub File Name",
+    "", cmVS7FlagTable::UserValue},
+@@ -326,9 +328,11 @@ static cmVS7FlagTable cmVS11LinkFlagTable[] =
+   {"ImportLibrary", "IMPLIB:",
+    "Import Library",
+    "", cmVS7FlagTable::UserValue},
++#if 0
+   {"MergeSections", "MERGE:",
+    "Merge Sections",
+    "", cmVS7FlagTable::UserValue},
++#endif
+   {"LinkKeyFile", "KEYFILE:",
+    "Key File",
+    "", cmVS7FlagTable::UserValue},
+diff --git a/Source/cmVS12LinkFlagTable.h b/Source/cmVS12LinkFlagTable.h
+index e5a570e7c..3871a24eb 100644
+--- a/Source/cmVS12LinkFlagTable.h
++++ b/Source/cmVS12LinkFlagTable.h
+@@ -264,9 +264,11 @@ static cmVS7FlagTable cmVS12LinkFlagTable[] =
+   {"Version", "VERSION:",
+    "Version",
+    "", cmVS7FlagTable::UserValue},
++#if 0
+   {"SpecifySectionAttributes", "SECTION:",
+    "Specify Section Attributes",
+    "", cmVS7FlagTable::UserValue},
++#endif
+   {"MSDOSStubFileName", "STUB:",
+    "MS-DOS Stub File Name",
+    "", cmVS7FlagTable::UserValue},
+@@ -326,9 +328,11 @@ static cmVS7FlagTable cmVS12LinkFlagTable[] =
+   {"ImportLibrary", "IMPLIB:",
+    "Import Library",
+    "", cmVS7FlagTable::UserValue},
++#if 0
+   {"MergeSections", "MERGE:",
+    "Merge Sections",
+    "", cmVS7FlagTable::UserValue},
++#endif
+   {"LinkKeyFile", "KEYFILE:",
+    "Key File",
+    "", cmVS7FlagTable::UserValue},
+diff --git a/Source/cmVS14LinkFlagTable.h b/Source/cmVS14LinkFlagTable.h
+index 6d81d125f..19da3ee11 100644
+--- a/Source/cmVS14LinkFlagTable.h
++++ b/Source/cmVS14LinkFlagTable.h
+@@ -264,9 +264,11 @@ static cmVS7FlagTable cmVS14LinkFlagTable[] =
+   {"Version", "VERSION:",
+    "Version",
+    "", cmVS7FlagTable::UserValue},
++#if 0
+   {"SpecifySectionAttributes", "SECTION:",
+    "Specify Section Attributes",
+    "", cmVS7FlagTable::UserValue},
++#endif
+   {"MSDOSStubFileName", "STUB:",
+    "MS-DOS Stub File Name",
+    "", cmVS7FlagTable::UserValue},
+@@ -326,9 +328,11 @@ static cmVS7FlagTable cmVS14LinkFlagTable[] =
+   {"ImportLibrary", "IMPLIB:",
+    "Import Library",
+    "", cmVS7FlagTable::UserValue},
++#if 0
+   {"MergeSections", "MERGE:",
+    "Merge Sections",
+    "", cmVS7FlagTable::UserValue},
++#endif
+   {"LinkKeyFile", "KEYFILE:",
+    "Key File",
+    "", cmVS7FlagTable::UserValue},
+-- 
+2.17.1
+

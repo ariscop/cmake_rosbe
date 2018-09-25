@@ -1,0 +1,90 @@
+From 026b2386733214f4d63d0103aa3f3d83b30cc45a Mon Sep 17 00:00:00 2001
+From: Amine Khaldi <amine.khaldi@reactos.org>
+Date: Sat, 21 Mar 2015 20:10:10 +0100
+Subject: [PATCH 13/17] Add the NOOP trick to handle OBJECT_OUTPUTS with ninja.
+ This work is kindly provided by Nils Gladitz.
+
+---
+ Source/cmGlobalNinjaGenerator.cxx | 22 ++++++++++++++++++++++
+ Source/cmGlobalNinjaGenerator.h   |  1 +
+ Source/cmNinjaTargetGenerator.cxx | 12 ++++++++----
+ 3 files changed, 31 insertions(+), 4 deletions(-)
+
+diff --git a/Source/cmGlobalNinjaGenerator.cxx b/Source/cmGlobalNinjaGenerator.cxx
+index b30add5f1..4c7503c34 100644
+--- a/Source/cmGlobalNinjaGenerator.cxx
++++ b/Source/cmGlobalNinjaGenerator.cxx
+@@ -246,6 +246,27 @@ void cmGlobalNinjaGenerator::AddCustomCommandRule()
+                 /*generator*/ false);
+ }
+ 
++void cmGlobalNinjaGenerator::AddNoopCommandRule()
++{
++  cmLocalGenerator *lg = this->LocalGenerators[0];
++  cmMakefile* mfRoot = lg->GetMakefile();
++
++  std::string cmd = lg->ConvertToOutputFormat(mfRoot->GetRequiredDefinition("CMAKE_COMMAND"),
++                                              cmLocalGenerator::SHELL);
++  cmd += " -E echo_append";
++
++  this->AddRule("NOOP_COMMAND",
++                cmd,
++                "NOOP",
++                "Rule for running noop command.",
++                /*depfile*/ "",
++                /*deptype*/ "",
++                /*rspfile*/ "",
++                /*rspcontent*/ "",
++                /*restat*/ "1",
++                /*generator*/ false);
++}
++
+ void
+ cmGlobalNinjaGenerator::WriteCustomCommandBuild(const std::string& command,
+                                                 const std::string& description,
+@@ -263,6 +284,7 @@ cmGlobalNinjaGenerator::WriteCustomCommandBuild(const std::string& command,
+ #endif
+ 
+   this->AddCustomCommandRule();
++  this->AddNoopCommandRule();
+ 
+   cmNinjaVars vars;
+   vars["COMMAND"] = cmd;
+diff --git a/Source/cmGlobalNinjaGenerator.h b/Source/cmGlobalNinjaGenerator.h
+index 3d443d8ed..5192a8be4 100644
+--- a/Source/cmGlobalNinjaGenerator.h
++++ b/Source/cmGlobalNinjaGenerator.h
+@@ -251,6 +251,7 @@ public:
+   bool HasRule(const std::string& name);
+ 
+   void AddCustomCommandRule();
++  void AddNoopCommandRule();
+   void AddMacOSXContentRule();
+ 
+   bool HasCustomCommandOutput(const std::string &output) {
+diff --git a/Source/cmNinjaTargetGenerator.cxx b/Source/cmNinjaTargetGenerator.cxx
+index 05b9219d5..d3b40be22 100644
+--- a/Source/cmNinjaTargetGenerator.cxx
++++ b/Source/cmNinjaTargetGenerator.cxx
+@@ -791,10 +791,14 @@ cmNinjaTargetGenerator
+     cmSystemTools::ExpandListArgument(objectOutputs, outputList);
+     std::transform(outputList.begin(), outputList.end(), outputList.begin(),
+                    MapToNinjaPath());
+-    this->GetGlobalGenerator()->WritePhonyBuild(this->GetBuildFileStream(),
+-                                                "Additional output files.",
+-                                                outputList,
+-                                                outputs);
++    this->GetGlobalGenerator()->WriteBuild(this->GetBuildFileStream(),
++                                           "Additional output files.",
++                                           "NOOP_COMMAND",
++                                           outputList,
++                                           outputs,
++                                           cmNinjaDeps(),
++                                           cmNinjaDeps(),
++                                           cmNinjaVars());
+   }
+ 
+   if(const char* objectLocationStr = source->GetProperty("OBJECT_LOCATION")) {
+-- 
+2.17.1
+

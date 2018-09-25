@@ -1,0 +1,26 @@
+From 761aa75059e03430d801c9024f0eaa1753b3ac26 Mon Sep 17 00:00:00 2001
+From: Amine Khaldi <amine.khaldi@reactos.org>
+Date: Fri, 20 Mar 2015 11:06:47 +0100
+Subject: [PATCH 06/17] Do not compute architecture specific link flags when
+ dealing with static libs.
+
+---
+ Source/cmNinjaNormalTargetGenerator.cxx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Source/cmNinjaNormalTargetGenerator.cxx b/Source/cmNinjaNormalTargetGenerator.cxx
+index c352c1a59..33d1b6b69 100644
+--- a/Source/cmNinjaNormalTargetGenerator.cxx
++++ b/Source/cmNinjaNormalTargetGenerator.cxx
+@@ -502,7 +502,7 @@ void cmNinjaNormalTargetGenerator::WriteLinkStatement()
+     localGen.AddArchitectureFlags(t, &genTarget, TargetLinkLanguage, cfgName);
+     vars["FLAGS"] = t;
+     }
+-  else
++  else if (targetType == cmTarget::SHARED_LIBRARY || targetType == cmTarget::MODULE_LIBRARY)
+     {
+     std::string t = vars["ARCH_FLAGS"];
+     localGen.AddArchitectureFlags(t, &genTarget, TargetLinkLanguage, cfgName);
+-- 
+2.17.1
+

@@ -1,0 +1,36 @@
+From 97cb1d2468fbf001f212a9afadd4df248a90cb6b Mon Sep 17 00:00:00 2001
+From: Andrew Cook <ariscop@gmail.com>
+Date: Tue, 25 Sep 2018 15:59:02 +1000
+Subject: [PATCH 2/2] 
+ https://github.com/DragonFlyBSD/DPorts/commit/a680cc6ef758e2f15be8bf8209da51658e02d710
+
+---
+ gcc/cp/cfns.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/gcc/cp/cfns.h b/gcc/cp/cfns.h
+index 62cdfab93aa..6bbc8c950ca 100644
+--- a/gcc/cp/cfns.h
++++ b/gcc/cp/cfns.h
+@@ -53,6 +53,9 @@ __inline
+ static unsigned int hash (const char *, unsigned int);
+ #ifdef __GNUC__
+ __inline
++#ifdef __GNUC_STDC_INLINE__
++__attribute__ ((__gnu_inline__))
++#endif
+ #endif
+ const char * libc_name_p (const char *, unsigned int);
+ /* maximum key range = 391, duplicates = 0 */
+@@ -96,7 +99,7 @@ hash (register const char *str, register unsigned int len)
+       400, 400, 400, 400, 400, 400, 400, 400, 400, 400,
+       400, 400, 400, 400, 400, 400, 400
+     };
+-  register int hval = len;
++  register int hval = (int) len;
+ 
+   switch (hval)
+     {
+-- 
+2.17.1
+

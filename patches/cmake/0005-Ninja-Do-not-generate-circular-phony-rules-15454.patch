@@ -1,0 +1,39 @@
+From 85645bb50ed371f7c5815e903c7de45d8cf01a7b Mon Sep 17 00:00:00 2001
+From: Brad King <brad.king@kitware.com>
+Date: Wed, 18 Mar 2015 12:51:28 -0400
+Subject: [PATCH 05/17] Ninja: Do not generate circular phony rules (#15454)
+
+The phony rules added by commit v2.8.12~248^2 (Ninja: Custom Command
+file depends don't need to exist before building, 2013-06-07) are
+circular, e.g.
+
+  build side-effect: phony side-effect
+
+This is not diagnosed by Ninja as of version 1.5, but the dependency
+does not make sense.  Simply drop it and use phony rules of the form
+
+  build side-effect: phony
+
+instead.
+
+Reported-by: Daniel Dunbar
+---
+ Source/cmGlobalNinjaGenerator.cxx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Source/cmGlobalNinjaGenerator.cxx b/Source/cmGlobalNinjaGenerator.cxx
+index 3c07be114..b30add5f1 100644
+--- a/Source/cmGlobalNinjaGenerator.cxx
++++ b/Source/cmGlobalNinjaGenerator.cxx
+@@ -1063,7 +1063,7 @@ void cmGlobalNinjaGenerator::WriteUnknownExplicitDependencies(std::ostream& os)
+       this->WritePhonyBuild(os,
+                             "",
+                             deps,
+-                            deps);
++                            cmNinjaDeps());
+       }
+    }
+ }
+-- 
+2.17.1
+
