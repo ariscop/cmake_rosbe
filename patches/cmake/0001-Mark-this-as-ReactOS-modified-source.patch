@@ -1,7 +1,7 @@
-From 3a6be781e7b26044b765af4876c2b5be65f940ea Mon Sep 17 00:00:00 2001
+From 16be8d6518a2c25b578078495d5f6bea397e2050 Mon Sep 17 00:00:00 2001
 From: Amine Khaldi <amine.khaldi@reactos.org>
 Date: Wed, 4 Feb 2015 16:15:51 +0100
-Subject: [PATCH 01/17] Mark this as ReactOS modified source.
+Subject: [PATCH 1/7] Mark this as ReactOS modified source.
 
 ---
  Source/CMakeVersionCompute.cmake | 1 +

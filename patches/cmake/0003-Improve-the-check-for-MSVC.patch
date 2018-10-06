@@ -1,17 +1,17 @@
-From 084c76be4f513069dc1469f0bbe0d27dec7e2dd7 Mon Sep 17 00:00:00 2001
+From 630f65bf36ce80880133fa56cd7806688009245a Mon Sep 17 00:00:00 2001
 From: Amine Khaldi <amine.khaldi@reactos.org>
 Date: Sat, 21 Mar 2015 19:56:03 +0100
-Subject: [PATCH 12/17] Improve the check for MSVC.
+Subject: [PATCH 3/7] Improve the check for MSVC.
 
 ---
  Source/cmNinjaTargetGenerator.cxx | 7 +++++--
  1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/Source/cmNinjaTargetGenerator.cxx b/Source/cmNinjaTargetGenerator.cxx
-index 8f7ed4b68..05b9219d5 100644
+index 6e6dc60ef..567f45403 100644
 --- a/Source/cmNinjaTargetGenerator.cxx
 +++ b/Source/cmNinjaTargetGenerator.cxx
-@@ -375,8 +375,11 @@ std::string cmNinjaTargetGenerator::GetTargetName() const
+@@ -279,8 +279,11 @@ std::string cmNinjaTargetGenerator::GetTargetName() const
  bool cmNinjaTargetGenerator::SetMsvcTargetPdbVariable(cmNinjaVars& vars) const
  {
    cmMakefile* mf = this->GetMakefile();

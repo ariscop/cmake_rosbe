@@ -1,7 +1,7 @@
-From 761aa75059e03430d801c9024f0eaa1753b3ac26 Mon Sep 17 00:00:00 2001
+From 5842f6ecb45c590c989b95facbee1136d7216c1f Mon Sep 17 00:00:00 2001
 From: Amine Khaldi <amine.khaldi@reactos.org>
 Date: Fri, 20 Mar 2015 11:06:47 +0100
-Subject: [PATCH 06/17] Do not compute architecture specific link flags when
+Subject: [PATCH 2/7] Do not compute architecture specific link flags when
  dealing with static libs.
 
 ---
@@ -9,10 +9,10 @@ Subject: [PATCH 06/17] Do not compute architecture specific link flags when
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Source/cmNinjaNormalTargetGenerator.cxx b/Source/cmNinjaNormalTargetGenerator.cxx
-index c352c1a59..33d1b6b69 100644
+index 84c19a30a..d56354cf0 100644
 --- a/Source/cmNinjaNormalTargetGenerator.cxx
 +++ b/Source/cmNinjaNormalTargetGenerator.cxx
-@@ -502,7 +502,7 @@ void cmNinjaNormalTargetGenerator::WriteLinkStatement()
+@@ -523,7 +523,7 @@ void cmNinjaNormalTargetGenerator::WriteLinkStatement()
      localGen.AddArchitectureFlags(t, &genTarget, TargetLinkLanguage, cfgName);
      vars["FLAGS"] = t;
      }

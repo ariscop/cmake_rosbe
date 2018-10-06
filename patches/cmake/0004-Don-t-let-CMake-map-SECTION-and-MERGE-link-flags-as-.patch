@@ -1,8 +1,8 @@
-From fb1c0b5e246bc24cc99e5fbe247af3652adf1012 Mon Sep 17 00:00:00 2001
+From 33dd42a8fedb00562be40ad7a57dea42ebef875f Mon Sep 17 00:00:00 2001
 From: Amine Khaldi <amine.khaldi@reactos.org>
 Date: Sun, 22 Mar 2015 16:39:08 +0100
-Subject: [PATCH 14/17] Don't let CMake map SECTION and MERGE link flags as
- that breaks some cases we have of multiple invocations of these commands.
+Subject: [PATCH 4/7] Don't let CMake map SECTION and MERGE link flags as that
+ breaks some cases we have of multiple invocations of these commands.
 
 ---
  Source/cmVS10LinkFlagTable.h | 4 ++++

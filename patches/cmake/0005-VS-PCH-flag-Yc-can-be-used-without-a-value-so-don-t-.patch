@@ -1,7 +1,7 @@
-From 19180002f865a7014473e22118c244f8f64809c5 Mon Sep 17 00:00:00 2001
+From 162481ecb8c25ab17d2db42382d3a038ef99cedf Mon Sep 17 00:00:00 2001
 From: Amine Khaldi <amine.khaldi@reactos.org>
 Date: Sun, 22 Mar 2015 16:40:48 +0100
-Subject: [PATCH 15/17] VS PCH flag /Yc can be used without a value so don't
+Subject: [PATCH 5/7] VS PCH flag /Yc can be used without a value so don't
  require one.
 
 ---
