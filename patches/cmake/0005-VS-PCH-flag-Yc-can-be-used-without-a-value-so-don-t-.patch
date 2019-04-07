@@ -1,0 +1,68 @@
+From f30af324d7d798a95a99bcc597211197c4ff6456 Mon Sep 17 00:00:00 2001
+From: Amine Khaldi <amine.khaldi@reactos.org>
+Date: Sun, 22 Mar 2015 16:40:48 +0100
+Subject: [PATCH 5/6] VS PCH flag /Yc can be used without a value so don't
+ require one.
+
+---
+ Source/cmVS10CLFlagTable.h  | 2 +-
+ Source/cmVS11CLFlagTable.h  | 2 +-
+ Source/cmVS12CLFlagTable.h  | 2 +-
+ Source/cmVS141CLFlagTable.h | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Source/cmVS10CLFlagTable.h b/Source/cmVS10CLFlagTable.h
+index dbd760ed17..5e6668935e 100644
+--- a/Source/cmVS10CLFlagTable.h
++++ b/Source/cmVS10CLFlagTable.h
+@@ -186,7 +186,7 @@ static cmVS7FlagTable cmVS10CLFlagTable[] = {
+   { "PreprocessOutputPath", "Fi", "Preprocess Output Path", "",
+     cmVS7FlagTable::UserValue },
+   { "PrecompiledHeaderFile", "Yc", "Precompiled Header Name", "",
+-    cmVS7FlagTable::UserValueRequired },
++    cmVS7FlagTable::UserValue },
+   { "PrecompiledHeaderFile", "Yu", "Precompiled Header Name", "",
+     cmVS7FlagTable::UserValueRequired },
+   { "PrecompiledHeaderOutputFile", "Fp", "Precompiled Header Output File", "",
+diff --git a/Source/cmVS11CLFlagTable.h b/Source/cmVS11CLFlagTable.h
+index 75317093f8..c00ad29e1e 100644
+--- a/Source/cmVS11CLFlagTable.h
++++ b/Source/cmVS11CLFlagTable.h
+@@ -201,7 +201,7 @@ static cmVS7FlagTable cmVS11CLFlagTable[] = {
+   { "PreprocessOutputPath", "Fi", "Preprocess Output Path", "",
+     cmVS7FlagTable::UserValue },
+   { "PrecompiledHeaderFile", "Yc", "Precompiled Header Name", "",
+-    cmVS7FlagTable::UserValueRequired },
++    cmVS7FlagTable::UserValue },
+   { "PrecompiledHeaderFile", "Yu", "Precompiled Header Name", "",
+     cmVS7FlagTable::UserValueRequired },
+   { "PrecompiledHeaderOutputFile", "Fp", "Precompiled Header Output File", "",
+diff --git a/Source/cmVS12CLFlagTable.h b/Source/cmVS12CLFlagTable.h
+index 9515c91b8a..44f3e0a1f6 100644
+--- a/Source/cmVS12CLFlagTable.h
++++ b/Source/cmVS12CLFlagTable.h
+@@ -203,7 +203,7 @@ static cmVS7FlagTable cmVS12CLFlagTable[] = {
+   { "PreprocessOutputPath", "Fi", "Preprocess Output Path", "",
+     cmVS7FlagTable::UserValue },
+   { "PrecompiledHeaderFile", "Yc", "Precompiled Header Name", "",
+-    cmVS7FlagTable::UserValueRequired },
++    cmVS7FlagTable::UserValue },
+   { "PrecompiledHeaderFile", "Yu", "Precompiled Header Name", "",
+     cmVS7FlagTable::UserValueRequired },
+   { "PrecompiledHeaderOutputFile", "Fp", "Precompiled Header Output File", "",
+diff --git a/Source/cmVS141CLFlagTable.h b/Source/cmVS141CLFlagTable.h
+index f751fc875d..de64cceb1e 100644
+--- a/Source/cmVS141CLFlagTable.h
++++ b/Source/cmVS141CLFlagTable.h
+@@ -232,7 +232,7 @@ static cmVS7FlagTable cmVS141CLFlagTable[] = {
+   { "PreprocessOutputPath", "Fi", "Preprocess Output Path", "",
+     cmVS7FlagTable::UserValue },
+   { "PrecompiledHeaderFile", "Yc", "Precompiled Header Name", "",
+-    cmVS7FlagTable::UserValueRequired },
++    cmVS7FlagTable::UserValue },
+   { "PrecompiledHeaderFile", "Yu", "Precompiled Header Name", "",
+     cmVS7FlagTable::UserValueRequired },
+   { "PrecompiledHeaderOutputFile", "Fp", "Precompiled Header Output File", "",
+-- 
+2.20.1
+

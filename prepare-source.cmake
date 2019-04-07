@@ -23,9 +23,9 @@ function(prepare_source _name)
     set(${_name}_version ${_src_VERSION} CACHE INTERNAL "")
 endfunction()
 
-prepare_source(cmake VERSION 3.2.1
-    DOWNLOAD_URL https://cmake.org/files/v3.2/cmake-3.2.1.tar.gz
-    URL_HASH SHA256=759f1cf6b1a26b037726a9acca6da501235c20ad3671df29d43f29052ef1502c)
+prepare_source(cmake VERSION 3.8.2
+    DOWNLOAD_URL https://cmake.org/files/v3.8/cmake-3.8.2.tar.gz
+    URL_HASH SHA256=da3072794eb4c09f2d782fcee043847b99bb4cf8d4573978d9b2024214d6e92d)
 
 prepare_source(binutils VERSION 2.24
     DOWNLOAD_URL https://ftp.gnu.org/gnu/binutils/binutils-<VERSION>.tar.bz2
@@ -84,21 +84,10 @@ apply_patch(${CMAKE_BINARY_DIR}/gcc
 apply_patch(${CMAKE_BINARY_DIR}/cmake
     cmake/0001-Mark-this-as-ReactOS-modified-source.patch
     cmake/0002-Account-for-XP-compatibility-when-linking-the-CMake-.patch
-    cmake/0003-Add-source-file-properties-EXTERNAL_SOURCE-and-OBJEC.patch
-    cmake/0004-Revert-Add-OBJECT_FILE_DIR-rule-placeholder-for-comp.patch
-    cmake/0005-Ninja-Do-not-generate-circular-phony-rules-15454.patch
-    cmake/0006-Do-not-compute-architecture-specific-link-flags-when.patch
-    cmake/0007-We-do-not-need-to-create-alias-targets-about-the-out.patch
-    cmake/0008-ninja-Store-target-level-flags-in-a-variable.patch
-    cmake/0009-ninja-Factor-out-target-level-definitions.patch
-    cmake/0010-ninja-Fix-and-refactor-variable-name-escaping.patch
-    cmake/0011-Simplify-EscapeTargetForVariable-and-apply-a-naming-.patch
-    cmake/0012-Improve-the-check-for-MSVC.patch
-    cmake/0013-Add-the-NOOP-trick-to-handle-OBJECT_OUTPUTS-with-nin.patch
-    cmake/0014-Don-t-let-CMake-map-SECTION-and-MERGE-link-flags-as-.patch
-    cmake/0015-VS-PCH-flag-Yc-can-be-used-without-a-value-so-don-t-.patch
-    cmake/0016-Empty-IncludePath-ReferencePath-LibraryPath-LibraryW.patch
-    cmake/0017-Don-t-let-CMake-handle-CharacterSet.-Same-for-Precom.patch
+    cmake/0003-Empty-IncludePath-ReferencePath-LibraryPath-LibraryW.patch
+    cmake/0004-Don-t-let-CMake-map-SECTION-and-MERGE-link-flags-as-.patch
+    cmake/0005-VS-PCH-flag-Yc-can-be-used-without-a-value-so-don-t-.patch
+    cmake/0006-Don-t-let-CMake-handle-CharacterSet.-Same-for-Precom.patch
 )
 
 extract_archive(gmp  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/gcc)

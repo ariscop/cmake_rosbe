@@ -1,0 +1,120 @@
+From 4a59df2aa3f8a8ee982431daed0ca73ad37180ce Mon Sep 17 00:00:00 2001
+From: Amine Khaldi <amine.khaldi@reactos.org>
+Date: Sun, 22 Mar 2015 16:39:08 +0100
+Subject: [PATCH 4/6] Don't let CMake map SECTION and MERGE link flags as that
+ breaks some cases we have of multiple invocations of these commands.
+
+---
+ Source/cmVS10LinkFlagTable.h | 4 ++++
+ Source/cmVS11LinkFlagTable.h | 4 ++++
+ Source/cmVS12LinkFlagTable.h | 4 ++++
+ Source/cmVS14LinkFlagTable.h | 4 ++++
+ 4 files changed, 16 insertions(+)
+
+diff --git a/Source/cmVS10LinkFlagTable.h b/Source/cmVS10LinkFlagTable.h
+index c30ea9a664..24d6d2148e 100644
+--- a/Source/cmVS10LinkFlagTable.h
++++ b/Source/cmVS10LinkFlagTable.h
+@@ -198,8 +198,10 @@ static cmVS7FlagTable cmVS10LinkFlagTable[] = {
+   // String Properties
+   { "OutputFile", "OUT:", "Output File", "", cmVS7FlagTable::UserValue },
+   { "Version", "VERSION:", "Version", "", cmVS7FlagTable::UserValue },
++#if 0
+   { "SpecifySectionAttributes", "SECTION:", "Specify Section Attributes", "",
+     cmVS7FlagTable::UserValue },
++#endif
+   { "MSDOSStubFileName", "STUB:", "MS-DOS Stub File Name", "",
+     cmVS7FlagTable::UserValue },
+   // Skip [TrackerLogDirectory] - no command line Switch.
+@@ -234,8 +236,10 @@ static cmVS7FlagTable cmVS10LinkFlagTable[] = {
+   { "BaseAddress", "BASE:", "Base Address", "", cmVS7FlagTable::UserValue },
+   { "ImportLibrary", "IMPLIB:", "Import Library", "",
+     cmVS7FlagTable::UserValue },
++#if 0
+   { "MergeSections", "MERGE:", "Merge Sections", "",
+     cmVS7FlagTable::UserValue },
++#endif
+   { "LinkKeyFile", "KEYFILE:", "Key File", "", cmVS7FlagTable::UserValue },
+   { "KeyContainer", "KEYCONTAINER:", "Key Container", "",
+     cmVS7FlagTable::UserValue },
+diff --git a/Source/cmVS11LinkFlagTable.h b/Source/cmVS11LinkFlagTable.h
+index 1b3a046f68..55709f2e5a 100644
+--- a/Source/cmVS11LinkFlagTable.h
++++ b/Source/cmVS11LinkFlagTable.h
+@@ -217,8 +217,10 @@ static cmVS7FlagTable cmVS11LinkFlagTable[] = {
+   // String Properties
+   { "OutputFile", "OUT:", "Output File", "", cmVS7FlagTable::UserValue },
+   { "Version", "VERSION:", "Version", "", cmVS7FlagTable::UserValue },
++#if 0
+   { "SpecifySectionAttributes", "SECTION:", "Specify Section Attributes", "",
+     cmVS7FlagTable::UserValue },
++#endif
+   { "MSDOSStubFileName", "STUB:", "MS-DOS Stub File Name", "",
+     cmVS7FlagTable::UserValue },
+   // Skip [TrackerLogDirectory] - no command line Switch.
+@@ -259,8 +261,10 @@ static cmVS7FlagTable cmVS11LinkFlagTable[] = {
+   { "BaseAddress", "BASE:", "Base Address", "", cmVS7FlagTable::UserValue },
+   { "ImportLibrary", "IMPLIB:", "Import Library", "",
+     cmVS7FlagTable::UserValue },
++#if 0
+   { "MergeSections", "MERGE:", "Merge Sections", "",
+     cmVS7FlagTable::UserValue },
++#endif
+   { "LinkKeyFile", "KEYFILE:", "Key File", "", cmVS7FlagTable::UserValue },
+   { "KeyContainer", "KEYCONTAINER:", "Key Container", "",
+     cmVS7FlagTable::UserValue },
+diff --git a/Source/cmVS12LinkFlagTable.h b/Source/cmVS12LinkFlagTable.h
+index 168c34c227..94bbeefc12 100644
+--- a/Source/cmVS12LinkFlagTable.h
++++ b/Source/cmVS12LinkFlagTable.h
+@@ -217,8 +217,10 @@ static cmVS7FlagTable cmVS12LinkFlagTable[] = {
+   // String Properties
+   { "OutputFile", "OUT:", "Output File", "", cmVS7FlagTable::UserValue },
+   { "Version", "VERSION:", "Version", "", cmVS7FlagTable::UserValue },
++#if 0
+   { "SpecifySectionAttributes", "SECTION:", "Specify Section Attributes", "",
+     cmVS7FlagTable::UserValue },
++#endif
+   { "MSDOSStubFileName", "STUB:", "MS-DOS Stub File Name", "",
+     cmVS7FlagTable::UserValue },
+   // Skip [TrackerLogDirectory] - no command line Switch.
+@@ -259,8 +261,10 @@ static cmVS7FlagTable cmVS12LinkFlagTable[] = {
+   { "BaseAddress", "BASE:", "Base Address", "", cmVS7FlagTable::UserValue },
+   { "ImportLibrary", "IMPLIB:", "Import Library", "",
+     cmVS7FlagTable::UserValue },
++#if 0
+   { "MergeSections", "MERGE:", "Merge Sections", "",
+     cmVS7FlagTable::UserValue },
++#endif
+   { "LinkKeyFile", "KEYFILE:", "Key File", "", cmVS7FlagTable::UserValue },
+   { "KeyContainer", "KEYCONTAINER:", "Key Container", "",
+     cmVS7FlagTable::UserValue },
+diff --git a/Source/cmVS14LinkFlagTable.h b/Source/cmVS14LinkFlagTable.h
+index 596f88095e..2ce563a2fb 100644
+--- a/Source/cmVS14LinkFlagTable.h
++++ b/Source/cmVS14LinkFlagTable.h
+@@ -228,8 +228,10 @@ static cmVS7FlagTable cmVS14LinkFlagTable[] = {
+   // String Properties
+   { "OutputFile", "OUT:", "Output File", "", cmVS7FlagTable::UserValue },
+   { "Version", "VERSION:", "Version", "", cmVS7FlagTable::UserValue },
++#if 0
+   { "SpecifySectionAttributes", "SECTION:", "Specify Section Attributes", "",
+     cmVS7FlagTable::UserValue },
++#endif
+   { "MSDOSStubFileName", "STUB:", "MS-DOS Stub File Name", "",
+     cmVS7FlagTable::UserValue },
+   // Skip [TrackerLogDirectory] - no command line Switch.
+@@ -270,8 +272,10 @@ static cmVS7FlagTable cmVS14LinkFlagTable[] = {
+   { "BaseAddress", "BASE:", "Base Address", "", cmVS7FlagTable::UserValue },
+   { "ImportLibrary", "IMPLIB:", "Import Library", "",
+     cmVS7FlagTable::UserValue },
++#if 0
+   { "MergeSections", "MERGE:", "Merge Sections", "",
+     cmVS7FlagTable::UserValue },
++#endif
+   { "LinkKeyFile", "KEYFILE:", "Key File", "", cmVS7FlagTable::UserValue },
+   { "KeyContainer", "KEYCONTAINER:", "Key Container", "",
+     cmVS7FlagTable::UserValue },
+-- 
+2.20.1
+

@@ -1,7 +1,7 @@
-From 5938528112fc45bbfd238e1cc5d0215a6ea36979 Mon Sep 17 00:00:00 2001
+From c3985eddcc5c15e9091bdea270ea72e0a89da4d6 Mon Sep 17 00:00:00 2001
 From: Amine Khaldi <amine.khaldi@reactos.org>
 Date: Sun, 22 Mar 2015 16:43:14 +0100
-Subject: [PATCH 16/17] Empty IncludePath, ReferencePath, LibraryPath,
+Subject: [PATCH 3/6] Empty IncludePath, ReferencePath, LibraryPath,
  LibraryWPath and SourcePath when cross compiling. This speeds things up with
  VS solutions as we avoid looking into the system headers and libs (we use our
  own).
@@ -11,12 +11,12 @@ Subject: [PATCH 16/17] Empty IncludePath, ReferencePath, LibraryPath,
  1 file changed, 10 insertions(+)
 
 diff --git a/Source/cmVisualStudio10TargetGenerator.cxx b/Source/cmVisualStudio10TargetGenerator.cxx
-index a286049cb..4f3b9639e 100644
+index cb6afe17d7..1b84977a19 100644
 --- a/Source/cmVisualStudio10TargetGenerator.cxx
 +++ b/Source/cmVisualStudio10TargetGenerator.cxx
-@@ -677,6 +677,16 @@ void cmVisualStudio10TargetGenerator::WriteProjectConfigurationValues()
+@@ -914,6 +914,16 @@ void cmVisualStudio10TargetGenerator::WriteProjectConfigurationValues()
        this->WriteNsightTegraConfigurationValues(*i);
-       }
+     }
  
 +    // ReactOS: empty default includes
 +    if (this->Makefile->IsOn("CMAKE_CROSSCOMPILING"))
@@ -29,8 +29,8 @@ index a286049cb..4f3b9639e 100644
 +    }
 +
      this->WriteString("</PropertyGroup>\n", 1);
-     }
+   }
  }
 -- 
-2.17.1
+2.20.1
 
